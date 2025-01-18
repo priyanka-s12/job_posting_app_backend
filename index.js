@@ -18,6 +18,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+app.get('/', (req, res) => res.send('Hello, Express'));
+
 async function addJob(newJob) {
   try {
     const job = new Job(newJob);
