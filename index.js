@@ -89,8 +89,11 @@ app.get('/jobs/:jobId', async (req, res) => {
 
 async function getJobByTitle(title) {
   try {
-    const job = await Job.findOne({ jobTitle: title });
-    return job;
+    const jobs = await Job.find();
+    const filteredJobs = jobs.filter((job) =>
+      job.jobTitle.toLowerCase().includes(title.toLowerCase())
+    );
+    return filteredJobs;
   } catch (error) {
     console.log(error);
   }
@@ -98,17 +101,12 @@ async function getJobByTitle(title) {
 
 app.get('/jobs/search/:title', async (req, res) => {
   try {
-    const title = req.params.title;
+    const jobs = await getJobByTitle(req.params.title);
 
-    const jobs = await Job.find();
-    const filteredJobs = jobs.filter((job) =>
-      job.jobTitle.toLowerCase().includes(title.toLowerCase())
-    );
-
-    if (filteredJobs.length === 0) {
-      res.status(404).json({ error: `No ${title} job found` });
+    if (jobs.length === 0) {
+      res.status(404).json({ error: `No ${req.params.title} job found` });
     } else {
-      res.status(200).json(filteredJobs);
+      res.status(200).json(jobs);
     }
   } catch (error) {
     res.status(500).json({ error: 'Failed to get a job by its title' });
